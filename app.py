@@ -5,9 +5,6 @@ from flask_pymongo import PyMongo
 import requests
 from datetime import datetime
 from pymongo import MongoClient
-from apscheduler.schedulers.background import BackgroundScheduler
-import firebase_admin
-from firebase_admin import credentials, messaging,initialize_app
 from base64 import b64decode
 import json
 from dotenv import load_dotenv
@@ -60,7 +57,3 @@ load_dotenv()
 if __name__ == "__main__":
     os.makedirs("uploads", exist_ok=True)
     app.run(host="localhost", port=5000)  # Correct host and port for Cloud Run
-
-
-
-
