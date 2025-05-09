@@ -5,7 +5,6 @@ from flask_pymongo import PyMongo
 import requests
 from datetime import datetime
 from pymongo import MongoClient
-from base64 import b64decode
 import json
 from dotenv import load_dotenv
 
