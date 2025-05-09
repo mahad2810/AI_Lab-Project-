@@ -14,6 +14,20 @@
     />
     <title>Disease Prediction</title>
     <style>
+       :root {
+            --primary: #FFE6E6;
+            --primary-light: #4FC1AF;
+            --secondary: #CC543F;
+            --accent: #00C9A7;
+            --light: #33AB9F;
+            --dark: #001919;
+            --gray: #666;
+            --white: #fff;
+            --background: #f9f9f9;
+            --text: #333;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
       /* Global Styles */
       body {
         font-family: Arial, sans-serif;
@@ -21,6 +35,61 @@
         margin: 0;
         padding: 0;
         color: #333;
+        transition: var(--transition);
+      }
+      
+      /* Dark Theme Styles */
+      body.dark-theme {
+        background-color: #1a1a1a;
+        color: #f0f0f0;
+      }
+      
+      body.dark-theme .container {
+        background-color: #333;
+        box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+      }
+      
+      body.dark-theme .nav-links a {
+        color: #f0f0f0;
+      }
+      
+      body.dark-theme .theme-toggle {
+        color: #f0f0f0;
+      }
+      
+      body.dark-theme h1, 
+      body.dark-theme h2 {
+        color: #f0f0f0;
+      }
+      
+      body.dark-theme .tab-content {
+        background-color: #333;
+      }
+      
+      body.dark-theme #chat-interface {
+        background: #2a2a2a;
+      }
+      
+      body.dark-theme .user-message {
+        background-color: #444;
+        color: #f0f0f0;
+      }
+      
+      body.dark-theme .bot-message,
+      body.dark-theme .nurse-message {
+        background-color: #555;
+        color: #f0f0f0;
+      }
+      
+      body.dark-theme .chat-input-area input {
+        background-color: #444;
+        color: #f0f0f0;
+        border-color: #666;
+      }
+      
+      body.dark-theme .doctor-card {
+        background-color: #444;
+        color: #f0f0f0;
       }
     
       .container {
@@ -31,7 +100,164 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         border-radius: 10px;
       }
-    
+      
+      /* Navbar styling */
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 5%;
+        background-color: #ffe6e6;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+        z-index: 1000;
+      }
+      
+      body.dark-theme nav {
+        background-color: #222;
+        box-shadow: 0 2px 10px rgba(255, 255, 255, 0.05);
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--accent);
+      }
+
+      .logo img {
+        width: 50px;
+        height: 50px;
+        margin-right: 10px;
+        border-radius: 50%;
+      }
+
+      .logo span {
+        color: var(--secondary);
+        margin-left: 5px;
+      }
+      
+      body.dark-theme .logo {
+        color: #00C9A7;
+      }
+      
+      body.dark-theme .logo span {
+        color: #ff7a66;
+      }
+
+      .nav-links {
+        display: flex;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .nav-links li {
+        margin-left: 70px;
+      }
+
+      .nav-links a {
+        text-decoration: none;
+        color: var(--text);
+        font-weight: 500;
+        transition: var(--transition);
+      }
+
+      .nav-links a:hover {
+        color: var(--accent);
+      }
+
+      .right-nav {
+        display: flex;
+        align-items: center;
+      }
+
+      .theme-toggle {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 24px;
+        color: var(--text);
+        transition: var(--transition);
+        margin-left: 20px;
+        padding: 5px;
+      }
+
+      .theme-toggle:hover {
+        color: var(--accent);
+      }
+
+      .mobile-menu {
+        display: none;
+        font-size: 24px;
+        cursor: pointer;
+        margin-left: 15px;
+      }
+
+      /* Mobile Menu */
+      .mobile-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--background);
+        z-index: 1001;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+        transform: translateX(-100%);
+      }
+
+      .mobile-nav.active {
+        transform: translateX(0);
+      }
+
+      .mobile-nav-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 24px;
+        cursor: pointer;
+        color: var(--text);
+      }
+
+      .mobile-nav-links {
+        list-style: none;
+        text-align: center;
+        padding: 0;
+      }
+
+      .mobile-nav-links li {
+        margin-bottom: 20px;
+      }
+
+      .mobile-nav-links a {
+        text-decoration: none;
+        color: var(--text);
+        font-size: 24px;
+        font-weight: 500;
+        transition: var(--transition);
+      }
+
+      .mobile-nav-links a:hover {
+        color: var(--accent);
+      }
+      
+      /* Media queries for responsive design */
+      @media (max-width: 768px) {
+        .nav-links {
+          display: none;
+        }
+        
+        .mobile-menu {
+          display: block;
+        }
+      }
+
       h1, h2 {
         color: #333;
         text-align: center;
@@ -494,12 +720,31 @@
   font-size: 15px;
   color: #155724;
 }
-
       
     </style>
     
     <body>
-  
+  <nav>
+      <div class="logo">
+        <img src="static/logo.png" alt="MediAI Logo">
+        Bat<span>Med</span>
+      </div>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+      </ul>
+      <div class="right-nav">
+        <button class="theme-toggle">🌙</button>
+        <div class="mobile-menu">☰</div>
+      </div>
+    </nav>
+    
+    <!-- Mobile Navigation Menu -->
+    <div class="mobile-nav">
+      <div class="mobile-nav-close">✕</div>
+      <ul class="mobile-nav-links">
+        <li><a href="/">Home</a></li>
+      </ul>
+    </div>
     
       <div class="container">
         <div class="tabs">
@@ -635,6 +880,37 @@
     </div>
 
     <script>
+      // Theme toggle functionality
+    const themeToggle = document.querySelector('.theme-toggle');
+    const body = document.body;
+    
+    // Default to light theme
+    let isDarkTheme = false;
+    themeToggle.textContent = '🌙';
+    
+    themeToggle.addEventListener('click', () => {
+      isDarkTheme = !isDarkTheme;
+      body.classList.toggle('dark-theme', isDarkTheme);
+      
+      if (isDarkTheme) {
+        themeToggle.textContent = '☀️';
+      } else {
+        themeToggle.textContent = '🌙';
+      }
+    });
+    
+    // Mobile menu functionality
+    const mobileMenuBtn = document.querySelector('.mobile-menu');
+    const mobileNav = document.querySelector('.mobile-nav');
+    const mobileNavClose = document.querySelector('.mobile-nav-close');
+    
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileNav.classList.add('active');
+    });
+    
+    mobileNavClose.addEventListener('click', () => {
+      mobileNav.classList.remove('active');
+    });
       function openTab(event, tabId) {
         const tabs = document.querySelectorAll('.tab-content');
         const buttons = document.querySelectorAll('.tab-button');

@@ -144,16 +144,21 @@
         }
 
         .hero-image {
-            flex: 1;
-            position: relative;
-        }
+    flex: 1;
+    position: relative;
+    background: transparent; /* Transparent background */
+    border: none;            /* No border */
+    padding: 0;              /* Remove padding if any */
+    margin: 0;               /* Remove margin if needed */
+}
 
-        .hero-image img {
-            width: 100%;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px var(--shadow);
-            transition: var(--transition);
-        }
+.hero-image img {
+    width: 100%;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px var(--shadow);
+    transition: var(--transition);
+    display: block;
+}
 
         h1 {
             font-size: 48px;
@@ -239,7 +244,7 @@
 
         .icon-user {
             top: 15%;
-            right: 15%;
+            right: 5%;
             font-size: 60px;
         }
 
@@ -651,8 +656,8 @@
         <div class="container">
             <nav>
                 <div class="logo">
-                    <img src="/api/placeholder/50/50" alt="MediAI Logo">
-                    Medi<span>AI</span>
+                    <img src="static/logo.png" alt="MediAI Logo">
+                    Bat<span>Med</span>
                 </div>
                 <ul class="nav-links">
                     <li><a href="#home">Home</a></li>
@@ -662,7 +667,6 @@
                     <li><a href="#contact">Contact</a></li>
                 </ul>
                 <div class="right-nav">
-                    <button class="btn">Sign In</button>
                     <button class="theme-toggle">🌙</button>
                     <div class="mobile-menu">☰</div>
                 </div>
@@ -700,10 +704,10 @@
                 <div class="hero-text">
                     <h1>Healthcare Made Simple</h1>
                     <p>Book appointments, manage health records, and schedule tests all in one place. Harness the power of artificial intelligence to predict potential health issues based on your symptoms and images.</p>
-                    <a href="#features" class="btn">Get Started</a>
+                    <a href="/disease" class="btn">Get Started</a>
                 </div>
                 <div class="hero-image">
-                    <img src="/api/placeholder/600/400" alt="AI Healthcare Illustration">
+                    <img src="static/landingpage.jpg" alt="AI Healthcare Illustration">
                 </div>
             </div>
         </div>

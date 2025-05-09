@@ -7,7 +7,7 @@ from datetime import datetime
 from pymongo import MongoClient
 import json
 from dotenv import load_dotenv
-
+from chatbot import chatbot_blueprint
 
 app = Flask(__name__,static_folder='static')
 CORS(app)
@@ -39,7 +39,7 @@ from disease import disease_blueprint
 # Register the blueprint
 app.register_blueprint(disease_blueprint)
 
-
+app.register_blueprint(chatbot_blueprint)
 
 client = MongoClient(app.config["MONGO_URI"])
 db = client["healthcaresystem"]
