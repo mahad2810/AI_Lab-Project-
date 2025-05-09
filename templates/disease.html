@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- model-viewer for 3D avatar -->
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.153.0/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.153.0/examples/js/loaders/GLTFLoader.js"></script>
+
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <title>Disease Prediction</title>
+    <style>
+      /* Global Styles */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #ffe6e6;
+        margin: 0;
+        padding: 0;
+        color: #333;
+      }
+    
+      .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+      }
+    
+      h1, h2 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+    
+      label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 8px;
+      }
+    
+      /* Tab Navigation */
+      .tabs {
+        display: flex;
+        justify-content: space-around;
+        background-color: #009688;
+        border-radius: 10px 10px 0 0;
+        overflow: hidden;
+      }
+    
+      .tabs button {
+        flex: 1;
+        padding: 10px 20px;
+        background-color: #009688;
+        color: white;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        outline: none;
+      }
+    
+      .tabs button.active {
+        background-color: #00796b;
+      }
+    
+      .tab-content {
+        display: none;
+        padding: 20px;
+      }
+    
+      .tab-content.active {
+        display: block;
+      }
+    
+      /* Other existing styles (e.g., form, buttons) remain unchanged */
+      h1,
+      h2 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 8px;
+      }
+
+      /* Symptom Selection Form */
+      #symptom-form {
+        margin-bottom: 20px;
+      }
+
+      .custom-dropdown {
+        position: relative;
+      }
+
+      .custom-dropdown button {
+        display: block;
+        width: 100%;
+        background-color: #009688;
+        color: #fff;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      .custom-dropdown ul {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 10;
+        padding: 10px 0;
+      }
+
+      .custom-dropdown ul li {
+        padding: 10px 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .custom-dropdown ul li input[type="checkbox"] {
+        margin: 0;
+      }
+
+      .custom-dropdown ul li:hover {
+        background-color: #f2f2f2;
+      }
+
+      .selected-symptoms {
+        margin-top: 15px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+      }
+
+      .selected-symptoms ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      /* Buttons */
+      .btn {
+        background-color: #009688;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 10px;
+      }
+
+      .btn:hover {
+        background-color: #00796b;
+      }
+
+      /* Prediction Result */
+      #prediction-result {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        color: #333;
+        font-size: 18px;
+      }
+
+      /* Doctor Suggestions */
+      #doctor-suggestion {
+        margin-top: 20px;
+        display: none;
+      }
+
+      .doctor-card {
+        background-color: #fff;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .doctor-card h3 {
+        margin-top: 0;
+      }
+
+      .doctor-card button {
+        background-color: #ffb74d; /* Light orange color */
+        color: white; /* White text color */
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        transition: background-color 0.3s, transform 0.3s;
+      }
+
+      .doctor-card button:hover {
+        background-color: #ff9800; /* Darker orange for hover effect */
+        transform: scale(1.05); /* Slightly enlarge the button on hover */
+      }
+
+      /* Appointment Booking Form */
+      .modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 500px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        padding: 20px;
+      }
+
+      .modal-content {
+        max-height: 70vh;
+        overflow-y: auto;
+      }
+
+      .scrollable-form {
+        padding: 15px;
+      }
+
+      fieldset {
+        border: 1px solid #ccc;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+      }
+
+      legend {
+        font-weight: bold;
+      }
+
+      input[type="text"],
+      input[type="tel"],
+      input[type="email"],
+      select {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+      }
+
+      input[type="text"]:focus,
+      input[type="tel"]:focus,
+      input[type="email"]:focus,
+      select:focus {
+        border-color: #009688;
+        outline: none;
+        box-shadow: 0 0 5px rgba(0, 150, 136, 0.5);
+      }
+
+      .form-actions {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      /* Overlay Effect for Modal */
+      .modal + .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 999;
+      }
+
+      .site-header {
+        display: flex;
+        align-items: center;
+        padding: 20px; /* Adjust padding as needed */
+        background-color: #ffe6e6; /* Set the background color to #ffe6e6 */
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+      }
+
+      .logo-img {
+        width: 80px; /* Adjust image size as needed */
+        height: auto; /* Maintain aspect ratio */
+        margin-right: 15px; /* Space between image and name */
+      }
+
+      .logo-name {
+        font-size: 24px;
+        font-weight: bold;
+        color: #009688; /* Set the text color to #009688 */
+      }
+      .btn-upload {
+        margin-top: 20px;
+      }
+      .result {
+        margin-top: 30px;
+        padding: 15px;
+        border-radius: 10px;
+      }
+      .result.success {
+        background-color: #d4edda;
+        color: #155724;
+      }
+      .result.error {
+        background-color: #f8d7da;
+        color: #721c24;
+      }
+
+      #chat-interface {
+        position: relative;
+        padding-top: 160px; /* space for avatar */
+        max-width: 600px;
+        margin: auto;
+        margin-top:70px;
+        background: #f7fdfd;
+        border-radius: 20px;
+        padding-bottom: 20px;
+        box-shadow: 0 0 20px rgba(0, 150, 136, 0.2);
+      }
+      
+      .nurse-floating {
+        position: absolute;
+        top: -40px;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        z-index: 2;
+      }
+      
+      .nurse-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #fff;
+        background-color: #ffffff;
+      }
+      
+      .nurse-bubble {
+        position: absolute;
+        top: -10px;
+        right: -160px;
+        background-color: #009688;
+        color: white;
+        padding: 12px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        width: 180px;
+        text-align: left;
+      }
+      
+      #chat-window {
+        max-height: 400px;
+        overflow-y: auto;
+        padding: 20px;
+        margin-bottom: 10px;
+      }
+      
+      .chat-message {
+        margin: 10px 0;
+        padding: 12px 16px;
+        border-radius: 20px;
+        max-width: 70%;
+        line-height: 1.4;
+        word-wrap: break-word;
+      }
+      
+      .user-message {
+        background-color: #e0f2f1;
+        align-self: flex-end;
+        text-align: right;
+        margin-left: auto;
+      }
+      
+      .bot-message {
+        background-color: #d0f0ff;
+        align-self: flex-start;
+        text-align: left;
+        margin-right: auto;
+      }
+      
+      .chat-input-area {
+        display: flex;
+        padding: 10px 20px;
+        gap: 10px;
+      }
+      
+      .chat-input-area input {
+        flex: 1;
+        padding: 12px 16px;
+        border: 1px solid #ccc;
+        border-radius: 20px;
+        outline: none;
+        font-size: 16px;
+      }
+      
+      .chat-input-area button {
+        background-color: #009688;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        padding: 10px 14px;
+        cursor: pointer;
+        font-size: 18px;
+      }
+      /* Fade-in effect for messages */
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.user-message, .nurse-message {
+  animation: fadeIn 0.5s ease-out;
+}
+/* Disease Prediction Styling */
+.disease-prediction {
+  background-color: #f8d7da;  /* Light red */
+  border-left: 5px solid #f44336;  /* Red border to emphasize importance */
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  color: #721c24;  /* Dark red text */
+  font-size: 18px;
+  font-weight: bold;
+  font-family: Arial, sans-serif;
+}
+
+/* Precautions Section Styling */
+.precautions-section {
+  background-color: #fff3cd;  /* Light yellow */
+  border-left: 5px solid #ff9800;  /* Yellow border */
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  color: #856404;  /* Dark yellow text */
+  font-size: 16px;
+  font-family: Arial, sans-serif;
+}
+
+.precautions-section h3 {
+  margin-bottom: 10px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Routine Suggestions Section Styling */
+.routine-suggestions-section {
+  background-color: #d4edda;  /* Light green */
+  border-left: 5px solid #4caf50;  /* Green border */
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  color: #155724;  /* Dark green text */
+  font-size: 16px;
+  font-family: Arial, sans-serif;
+}
+
+.routine-suggestions-section h3 {
+  margin-bottom: 10px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.routine-suggestions-section ul {
+  margin-left: 20px;
+}
+
+.routine-suggestions-section li {
+  margin-bottom: 8px;
+  font-size: 15px;
+  color: #155724;
+}
+
+      
+    </style>
+    
+    <body>
+  
+    
+      <div class="container">
+        <div class="tabs">
+          <button class="tab-button active" onclick="openTab(event, 'symptom-checker')">Symptom Checker</button>
+          <button class="tab-button" onclick="openTab(event, 'skin-disease')">Skin Disease Prediction</button>
+        </div>
+    
+        <div id="symptom-checker" class="tab-content active">
+          <h1><i class="fas fa-notes-medical"></i> Know Your Symptom</h1>
+      
+          <div id="chat-interface">
+            <!-- Floating 3D Model Nurse -->
+            <div class="nurse-floating">
+              <model-viewer 
+              src="/static/doctor.glb" 
+              alt="Nurse AI" 
+              camera-controls 
+              disable-zoom 
+              autoplay 
+              animation-name="*"
+              style="width: 130px; height: 130px; background: none;">
+          </model-viewer>
+          
+              <div class="nurse-bubble">Hi, I’m Nurse AI! Tell me how you’re feeling 🩺</div>
+            </div>
+      
+            <!-- Chat Window -->
+            <div id="chat-window" class="chat-box"></div>
+      
+            <!-- Input Area -->
+            <div class="chat-input-area">
+              <input type="text" id="user-input" placeholder="Type your symptoms here..." onkeypress="handleKey(event)">
+              <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+          </div>
+        
+          
+            <div id="doctor-suggestions"></div>
+        </div>
+        
+        
+        
+        
+    
+        <div id="skin-disease" class="tab-content">
+          <h1>Skin Cancer Prediction</h1>
+          <p>Upload a dermoscopic image to check for signs of skin cancer.</p>
+          <form id="uploadForm">
+            <label for="image">Choose an Image:</label>
+            <input type="file" id="image" name="image" accept="image/*" required />
+            <button type="submit" class="btn btn-upload">Upload and Predict</button>
+          </form>
+          <div id="result" class="result" style="display: none"></div>
+        </div>
+      </div>
+
+    <!-- Appointment Booking Form -->
+    <div id="appointment-form" class="modal" style="display: none">
+      <h2><i class="fas fa-calendar-check"></i> Book Appointment</h2>
+      <div class="modal-content">
+        <div class="scrollable-form">
+          <form id="appointmentForm">
+            <fieldset>
+              <legend><i class="fas fa-user-md"></i> Doctor Details</legend>
+              <p>
+                <strong>Doctor:</strong> <span id="form-doctor-name"></span>
+              </p>
+              <p>
+                <strong>Specialization:</strong>
+                <span id="form-doctor-specialization"></span>
+              </p>
+              <p>
+                <strong>Hospital:</strong>
+                <span id="form-doctor-hospital"></span>
+              </p>
+            </fieldset>
+            <fieldset>
+              <legend><i class="fas fa-clock"></i> Appointment Details</legend>
+              <label for="appointmentDate"
+                ><i class="fas fa-calendar-alt"></i> Select Date:</label
+              >
+              <select id="appointmentDate" required></select>
+
+              <label for="appointmentTime"
+                ><i class="fas fa-clock"></i> Select Time:</label
+              >
+              <select id="appointmentTime" required></select>
+            </fieldset>
+            <fieldset>
+              <legend><i class="fas fa-user"></i> Your Details</legend>
+              <label for="userName"
+                ><i class="fas fa-user"></i> Your Name:</label
+              >
+              <input
+                type="text"
+                id="userName"
+                placeholder="Enter your full name"
+                required
+              />
+
+              <label for="userContact"
+                ><i class="fas fa-phone"></i> Contact Number:</label
+              >
+              <input
+                type="tel"
+                id="userContact"
+                placeholder="Enter your phone number"
+                required
+                pattern="[0-9]{10}"
+              />
+
+              <label for="userEmail"
+                ><i class="fas fa-envelope"></i> Email Address:</label
+              >
+              <input
+                type="email"
+                id="userEmail"
+                placeholder="Enter your email address"
+                required
+              />
+            </fieldset>
+            <div class="form-actions">
+              <button type="submit">
+                <i class="fas fa-check"></i> Confirm
+              </button>
+              <button type="button" onclick="closeModal('appointment-form')">
+                <i class="fas fa-times"></i> Close
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function openTab(event, tabId) {
+        const tabs = document.querySelectorAll('.tab-content');
+        const buttons = document.querySelectorAll('.tab-button');
+    
+        tabs.forEach((tab) => tab.classList.remove('active'));
+        buttons.forEach((button) => button.classList.remove('active'));
+    
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+      }
+    
+      let userId = "user_" + Math.random().toString(36).substring(2);
+      let predictedDisease = null;  // ✅ store disease from chatbot here
+    
+      // Utility function to replace asterisks with <strong> tags for bold
+function formatBoldText(text) {
+  return text.replace(/\*(.*?)\*/g, '<strong>$1</strong>'); // Replaces *text* with <strong>text</strong>
+}
+
+async function sendMessage() {
+  const inputBox = document.getElementById('user-input');
+  const responseBox = document.getElementById('chat-window');
+  const message = inputBox.value.trim();
+  if (!message) return;
+
+  responseBox.innerHTML += `
+    <div class="user-message">
+      <p>${message}</p>
+    </div>
+  `;
+  inputBox.value = '';
+
+  const loadingId = `loading-${Date.now()}`;
+  responseBox.innerHTML += `
+    <div class="nurse-message" id="${loadingId}">
+      <p>🩺 Aura is thinking...</p>
+    </div>
+  `;
+  responseBox.scrollTop = responseBox.scrollHeight;
+
+  try {
+    const res = await fetch('/chatbot/diagnose', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: message, user_id: userId })
+    });
+
+    const data = await res.json();
+    document.getElementById(loadingId)?.remove();
+
+    if (data.disease) {
+      predictedDisease = data.disease; // ✅ Save disease globally
+    }
+
+    // Format and display each part of the nurse's response with bold formatting
+    data.response.forEach(part => {
+      const formattedResponse = formatBoldText(part); // Apply bold formatting
+      responseBox.innerHTML += `
+        <div class="nurse-message">
+          <p>${formattedResponse}</p>
+        </div>
+      `;
+    });
+
+    responseBox.scrollTop = responseBox.scrollHeight;
+
+    // ✅ Auto-fetch doctors if user replies "yes" at referral stage
+    if (data.stage === "referral" || data.stage === "complete") {
+      const lowerMsg = message.toLowerCase();
+      if (["yes", "yeah", "sure", "okay", "yep", "please do"].some(word => lowerMsg.includes(word))) {
+        setTimeout(fetchDoctors, 500);
+      }
+    }
+
+  } catch (err) {
+    console.error(err);
+    document.getElementById(loadingId)?.remove();
+    responseBox.innerHTML += `
+      <div class="nurse-message">
+        <p>⚠️ Something went wrong. Please try again.</p>
+      </div>
+    `;
+  }
+}
+
+      
+    
+      function handleKey(event) {
+        if (event.key === 'Enter') sendMessage();
+      }
+    
+      async function fetchDoctors() {
+        const disease = predictedDisease;  // ✅ Get disease directly from global
+    
+        if (!disease) {
+          alert("Please predict a disease first.");
+          return;
+        }
+
+        console.log("Fetching doctors for disease:", disease);
+
+    
+        const doctorSuggestions = document.getElementById("doctor-suggestions");
+        doctorSuggestions.innerHTML = ""; // Clear previous suggestions
+    
+        try {
+          const response = await fetch("/get_doctors", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ disease }),
+          });
+    
+          let data;
+          try {
+            data = await response.json();
+          } catch (jsonError) {
+            const rawText = await response.text();
+            console.error("API returned non-JSON response:", rawText);
+            doctorSuggestions.innerHTML = `<p style="color: red;">Invalid server response: ${rawText}</p>`;
+            return;
+          }
+    
+          if (!Array.isArray(data.doctors) || data.doctors.length === 0) {
+            doctorSuggestions.innerHTML = "<p>No doctors currently available for this condition.</p>";
+            return;
+          }
+           console.log("List of doctors:", data.doctors);
+          const doctorsHtml = data.doctors
+            .map((doctor) => {
+              if (typeof doctor !== "object") {
+                console.error("Invalid doctor data:", doctor);
+                return '<div class="doctor-card">Invalid doctor information</div>';
+              }
+    
+              const achievements = Array.isArray(doctor.description?.achievements)
+                ? doctor.description.achievements.map((ach) => `<li>${ach}</li>`).join("")
+                : "<li>No achievements available.</li>";
+    
+              const degrees = Array.isArray(doctor.description?.degrees)
+                ? doctor.description.degrees.map((degree) => `<li>${degree}</li>`).join("")
+                : "<li>No degrees listed.</li>";
+    
+              return `
+                <div class="doctor-card">
+                  <h3><i class="fas fa-user-md"></i> Dr. ${doctor.name || "Name not available"}</h3>
+                  <p><strong><i class="fas fa-stethoscope"></i> Specialization:</strong> ${doctor.specialization || "Specialization not available"}</p>
+                  <p><strong><i class="fas fa-briefcase-medical"></i> Experience:</strong> ${doctor.description?.experience || "No experience details available."}</p>
+                  <p><strong><i class="fas fa-graduation-cap"></i> Degrees:</strong></p>
+                  <ul>${degrees}</ul>
+                  <p><strong><i class="fas fa-award"></i> Achievements:</strong></p>
+                  <ul>${achievements}</ul>
+                  <p><strong><i class="fas fa-phone-alt"></i> Phone Number:</strong> ${doctor.phone_number || "Not available"}</p>
+                  <p><strong><i class="fas fa-hospital"></i> Hospital:</strong> ${doctor.hospital || "Not available"}</p>
+                  <p><strong><i class="fas fa-money-bill-wave"></i> Fees:</strong> ₹${doctor.fees || "Not specified"}</p>
+                  <button onclick="openAppointmentForm('${encodeURIComponent(JSON.stringify(doctor))}')">
+                    <i class="fas fa-calendar-check"></i> Book Appointment
+                  </button>
+                </div>
+              `;
+            })
+            .join("");
+    
+          doctorSuggestions.innerHTML = doctorsHtml;
+        } catch (error) {
+          console.error("Error in fetchDoctors function:", error);
+          doctorSuggestions.innerHTML = `<p style="color: red;">Error fetching doctors. Please try again later.</p>`;
+        }
+      }
+
+      function openAppointmentForm(doctorString) {
+        try {
+          const doctor = JSON.parse(decodeURIComponent(doctorString)); // Decode and parse the doctor data
+
+          document.getElementById("form-doctor-name").innerText = doctor.name;
+          document.getElementById("form-doctor-specialization").innerText =
+            doctor.specialization;
+          document.getElementById("form-doctor-hospital").innerText =
+            doctor.hospital;
+
+          const availability = doctor.availability;
+          const dateSelect = document.getElementById("appointmentDate");
+          dateSelect.innerHTML = '<option value="">Select Date</option>';
+          const timeSelect = document.getElementById("appointmentTime");
+          timeSelect.innerHTML = '<option value="">Select Time</option>'; // Clear previous times
+
+          Object.keys(availability).forEach((date) => {
+            const dateOption = document.createElement("option");
+            dateOption.value = date;
+            dateOption.innerText = date;
+            dateSelect.appendChild(dateOption);
+          });
+
+          dateSelect.onchange = function () {
+            const selectedDate = dateSelect.value;
+            timeSelect.innerHTML = '<option value="">Select Time</option>'; // Clear previous time options
+
+            if (selectedDate && availability[selectedDate]) {
+              Object.keys(availability[selectedDate]).forEach((time) => {
+                const timeOption = document.createElement("option");
+                timeOption.value = time;
+                timeOption.innerText =
+                  time +
+                  " - Available slots: " +
+                  availability[selectedDate][time];
+                timeSelect.appendChild(timeOption);
+              });
+            }
+          };
+
+          document.getElementById("appointment-form").style.display = "block";
+          document.getElementById("doctor-suggestions").style.display = "none";
+        } catch (error) {
+          console.error("Error in openAppointmentForm:", error);
+          alert("There was an error processing the doctor's information.");
+        }
+      }
+
+      function closeModal(id) {
+        document.getElementById(id).style.display = "none";
+      }
+
+      document.getElementById("appointmentForm").onsubmit = function (event) {
+        event.preventDefault(); // Prevent form from submitting
+        bookAppointment(event); // Call the bookAppointment function
+      };
+
+      function bookAppointment(event) {
+        // Get the patient's details from the form
+        const name = document.getElementById("userName").value;
+        const phone = document.getElementById("userContact").value;
+        const email = document.getElementById("userEmail").value;
+        const date = document.getElementById("appointmentDate").value;
+        const time = document.getElementById("appointmentTime").value; // Fixed .value
+
+        // Get the doctor's details from the DOM
+        const doctorName =
+          document.getElementById("form-doctor-name").innerText;
+        const doctorSpecialization = document.getElementById(
+          "form-doctor-specialization"
+        ).innerText;
+        const doctorHospital = document.getElementById(
+          "form-doctor-hospital"
+        ).innerText;
+
+        // Combine date and time into one value
+        const dateTime = `${date}T${time}`;
+
+        // Check if all required fields are filled
+        if (
+          !name ||
+          !phone ||
+          !email ||
+          !date ||
+          !time ||
+          !doctorName ||
+          !doctorSpecialization ||
+          !doctorHospital
+        ) {
+          alert("Please fill in all the fields.");
+          return;
+        }
+
+        // Send data to the backend
+        fetch("/doclist/appointment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            patient_name: name,
+            doctor_name: doctorName,
+            doctor_specialization: doctorSpecialization,
+            doctor_hospital: doctorHospital,
+            phone: phone,
+            email: email,
+            date_time: dateTime,
+          }),
+        })
+          .then((response) => response.json())
+          .then((result) => {
+            if (result.message) {
+              alert(result.message); // Show success message
+            } else {
+              alert("Appointment booked successfully!");
+            }
+
+            // Reload the page to show the updated content (no redirect)
+            location.reload();
+
+            closeModal("appointment-form"); // Close the modal
+          })
+          .catch((err) => {
+            console.error("Error booking appointment:", err);
+            alert("There was an error booking the appointment.");
+          });
+      }
+
+      document
+  .getElementById("uploadForm")
+  .addEventListener("submit", async function (event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    const fileInput = document.getElementById("image");
+    const resultDiv = document.getElementById("result");
+
+    console.log("Form submission triggered.");
+
+    // Ensure a file is selected
+    if (!fileInput.files.length) {
+      console.error("No file selected.");
+      alert("Please select an image file.");
+      return;
+    }
+
+    console.log("File selected:", fileInput.files[0].name);
+
+    // Prepare the form data
+    const formData = new FormData();
+    formData.append("image", fileInput.files[0]);
+
+    try {
+      // Show a loading message
+      resultDiv.style.display = "block";
+      resultDiv.textContent = "Processing...";
+      console.log("Sending POST request to /predict.");
+
+      // Send the POST request to the backend
+      const response = await fetch("/predict", {
+        method: "POST",
+        body: formData,
+      });
+
+      console.log("POST request sent. Awaiting response...");
+
+      // Handle the response
+      if (!response.ok) {
+        console.error(
+          "Error in response from backend:",
+          response.status,
+          response.statusText
+        );
+        const errorData = await response.json();
+        throw new Error(
+          errorData.error || "An error occurred during prediction."
+        );
+      }
+
+      console.log("Response received from backend.");
+
+      const data = await response.json();
+      console.log("Prediction data:", data);
+
+      // Display only the final prediction
+      resultDiv.innerHTML = `
+        <h3>Final Prediction:</h3>
+        <p><strong>${data.Ensemble}</strong></p>
+      `;
+      console.log("Final prediction displayed on the frontend.");
+    } catch (error) {
+      // Display error message
+      console.error("Error during prediction:", error.message);
+      resultDiv.textContent = `Error: ${error.message}`;
+    } finally {
+      console.log("Form submission process completed.");
+    }
+  });
+
+    </script>
+  </body>
+</html>
