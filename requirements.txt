@@ -13,3 +13,4 @@ spacy
 google-generativeai
 email-validator
 pytz
+gunicorn
