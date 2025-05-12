@@ -1,0 +1,15 @@
+Flask
+Flask-Cors
+Flask-PyMongo
+python-dotenv
+pymongo
+requests
+numpy
+pandas
+scikit-learn
+opencv-python
+joblib
+spacy
+google-generativeai
+email-validator
+pytz
