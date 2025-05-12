@@ -20,6 +20,7 @@
   { "disease": "Hepatitis C", "specialization": "General Medicine" },
   { "disease": "Hepatitis D", "specialization": "General Medicine" },
   { "disease": "Hepatitis E", "specialization": "General Medicine" },
+  { "disease": "Fungal Infection", "specialization": "General Medicine" },
   { "disease": "GERD (Gastroesophageal Reflux Disease)", "specialization": "General Medicine" },
   { "disease": "Chronic cholestasis", "specialization": "General Medicine" },
   { "disease": "Peptic ulcer disease", "specialization": "General Medicine" },

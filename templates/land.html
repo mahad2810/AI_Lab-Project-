@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MediAI | AI-Powered Healthcare</title>
+    <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
+    <title>BatMed | AI-Powered Healthcare</title>
     <style>
         :root {
             --primary: #FFE6E6;
@@ -144,29 +145,30 @@
         }
 
         .hero-image {
-    flex: 1;
-    position: relative;
-    background: transparent; /* Transparent background */
-    border: none;            /* No border */
-    padding: 0;              /* Remove padding if any */
-    margin: 0;               /* Remove margin if needed */
-}
+            flex: 1;
+            position: relative;
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
+        }
 
-.hero-image img {
-    width: 100%;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px var(--shadow);
-    transition: var(--transition);
-    display: block;
-}
+        .hero-image img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px var(--shadow);
+            transition: var(--transition);
+            display: block;
+        }
 
-        h1 {
+        h3 {
             font-size: 48px;
             margin-bottom: 20px;
-            color: var(--dark);
+            color: var(--accent); 
             opacity: 0;
             transform: translateY(20px);
             animation: fadeInUp 0.8s forwards;
+            text-shadow: 2px 2px 4px var(--shadow);
         }
 
         .hero-text p {
@@ -196,9 +198,10 @@
         }
 
         .btn:hover {
-            background-color: var(--primary-light);
+            background-color: var(--secondary);
             transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 201, 167, 0.3);
+            box-shadow: 0 10px 20px rgba(204, 84, 63, 0.3);
+            opacity: 1 !important;
         }
 
         .circle-bg {
@@ -397,15 +400,15 @@
             z-index: 1;
         }
 
-        /* CTA Section */
-        .cta {
+        /* Feedback Section */
+        .feedback {
             padding: 100px 0;
             text-align: center;
             background-color: var(--background);
             position: relative;
         }
 
-        .cta h2 {
+        .feedback h2 {
             font-size: 36px;
             margin-bottom: 20px;
             color: var(--accent);
@@ -413,7 +416,7 @@
             transform: translateY(20px);
         }
 
-        .cta p {
+        .feedback p {
             font-size: 18px;
             margin-bottom: 30px;
             color: var(--gray);
@@ -424,6 +427,25 @@
             transform: translateY(20px);
         }
 
+        .feedback-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 40px;
+        }
+
+        
+
+        @keyframes rotate {
+            0% {
+                transform: rotateX(0) rotateY(0);
+            }
+            100% {
+                transform: rotateX(360deg) rotateY(360deg);
+            }
+        }
+
         /* Footer */
         footer {
             background-color: var(--dark);
@@ -432,9 +454,7 @@
         }
 
         .footer-content {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
+            text-align: center;
             margin-bottom: 40px;
         }
 
@@ -447,67 +467,6 @@
 
         .footer-logo span {
             color: var(--secondary);
-        }
-
-        .footer-section {
-            flex: 1;
-            min-width: 200px;
-            margin-bottom: 30px;
-        }
-
-        .footer-section h3 {
-            font-size: 18px;
-            margin-bottom: 20px;
-            position: relative;
-            padding-bottom: 10px;
-        }
-
-        .footer-section h3::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 50px;
-            height: 2px;
-            background-color: var(--accent);
-        }
-
-        .footer-links {
-            list-style: none;
-        }
-
-        .footer-links li {
-            margin-bottom: 10px;
-        }
-
-        .footer-links a {
-            color: #ccc;
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .footer-links a:hover {
-            color: var(--accent);
-        }
-
-        .social-links {
-            display: flex;
-            list-style: none;
-        }
-
-        .social-links li {
-            margin-right: 15px;
-        }
-
-        .social-links a {
-            color: white;
-            text-decoration: none;
-            font-size: 20px;
-            transition: var(--transition);
-        }
-
-        .social-links a:hover {
-            color: var(--accent);
         }
 
         .copyright {
@@ -566,6 +525,11 @@
             .step::after {
                 display: none;
             }
+            
+            .model-container {
+                width: 300px;
+                height: 300px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -592,9 +556,10 @@
             .step {
                 margin-bottom: 40px;
             }
-
-            .footer-content {
-                flex-direction: column;
+            
+            .model-container {
+                width: 250px;
+                height: 250px;
             }
         }
 
@@ -648,6 +613,14 @@
         .mobile-nav-links a:hover {
             color: var(--accent);
         }
+        model-viewer {
+  width: 150px;
+  height: 150px;
+  top: 1px;
+  margin: 0 auto;
+  animation: model-bounce 2s ease-in-out infinite;
+  filter: drop-shadow(0 5px 10px rgba(0, 150, 136, 0.3));
+}
     </style>
 </head>
 <body>
@@ -656,7 +629,7 @@
         <div class="container">
             <nav>
                 <div class="logo">
-                    <img src="static/logo.png" alt="MediAI Logo">
+                    <img src="static/logo.png" alt="BatMed Logo">
                     Bat<span>Med</span>
                 </div>
                 <ul class="nav-links">
@@ -702,8 +675,8 @@
         <div class="container">
             <div class="hero-content">
                 <div class="hero-text">
-                    <h1>Healthcare Made Simple</h1>
-                    <p>Book appointments, manage health records, and schedule tests all in one place. Harness the power of artificial intelligence to predict potential health issues based on your symptoms and images.</p>
+                    <h3>BatMed:The City Needs Us</h3>
+                    <p>Empowering your health with AI-driven insights: Predict diseases, detect skin cancer, and find the best doctors – all in one place!</p>
                     <a href="/disease" class="btn">Get Started</a>
                 </div>
                 <div class="hero-image">
@@ -771,12 +744,35 @@
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="cta">
+    <!-- Feedback Section -->
+    <section class="feedback" id="feedback">
         <div class="container">
-            <h2>Ready to Take Control of Your Health?</h2>
-            <p>Join thousands of users who are already benefiting from our AI-powered healthcare platform. Get started today and experience the future of healthcare.</p>
-            <a href="#" class="btn">Get Started Now</a>
+            <h2>We Value Your Feedback</h2>
+            <p>Help us improve BatMed by sharing your experience and suggestions. Your input is crucial to our mission of providing better healthcare solutions.</p>
+            
+            <div class="feedback-content">
+               <div class="nurse-floating">
+                <model-viewer 
+                    src="/static/cute_home_robot.glb" 
+                    alt="Nurse AI" 
+                    camera-controls 
+                    disable-zoom 
+                    autoplay 
+                    animation-name="*"
+                    
+                    style="width: 130px; height: 130px; background: none;">
+                </model-viewer>
+                
+                <div>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSeoloFZBHDPgsDRl3Zn7YzkhWUMccoN-4Xe-acwiwIukW-rBA/viewform?usp=dialog" 
+       class="btn" 
+       target="_blank" 
+       rel="noopener noreferrer">
+       Share Your Feedback
+    </a>
+</div>
+
+            </div>
         </div>
     </section>
 
@@ -784,40 +780,11 @@
     <footer>
         <div class="container">
             <div class="footer-content">
-                <div class="footer-section">
-                    <div class="footer-logo">Medi<span>AI</span></div>
-                    <p>Combining artificial intelligence with healthcare to provide better outcomes for patients worldwide.</p>
-                </div>
-                <div class="footer-section">
-                    <h3>Quick Links</h3>
-                    <ul class="footer-links">
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#features">Features</a></li>
-                        <li><a href="#how-it-works">How It Works</a></li>
-                        <li><a href="#about">About Us</a></li>
-                        <li><a href="#contact">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h3>Contact Us</h3>
-                    <ul class="footer-links">
-                        <li>Email: info@mediai.com</li>
-                        <li>Phone: +1 (555) 123-4567</li>
-                        <li>Address: 123 Healthcare Ave, Medical City</li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h3>Connect With Us</h3>
-                    <ul class="social-links">
-                        <li><a href="#">Facebook</a></li>
-                        <li><a href="#">Twitter</a></li>
-                        <li><a href="#">LinkedIn</a></li>
-                        <li><a href="#">Instagram</a></li>
-                    </ul>
-                </div>
+                <div class="footer-logo">Bat<span>Med</span></div>
+                <p>Combining artificial intelligence with healthcare to provide better outcomes for patients worldwide.</p>
             </div>
             <div class="copyright">
-                <p>&copy; 2025 MediAI. All Rights Reserved.</p>
+                <p>&copy; 2025 BatMed. All Rights Reserved.</p>
             </div>
         </div>
     </footer>
@@ -857,7 +824,7 @@
         
         // Animation on scroll
         const animateElements = () => {
-            const elements = document.querySelectorAll('.feature-card, .step, .cta h2, .cta p');
+            const elements = document.querySelectorAll('.feature-card, .step, .feedback h2, .feedback p');
             
             elements.forEach(element => {
                 const elementPosition = element.getBoundingClientRect().top;

@@ -159,18 +159,13 @@ def diagnose():
             responses.append("🩺 **Precautions:**\n- " + "\n- ".join([p.strip("- ") for p in precautions if p.strip()]))
             responses.append("🏃 **Routine Suggestions:**\n- " + "\n- ".join([r.strip("- ") for r in routine if r.strip()]))
             responses.append("Would you like help finding a doctor or specialist?")
-            session["stage"] = "referral"
+            session["stage"] = "complete"
             disease_to_return = disease  # ✅ Add to response
 
         else:
             responses.append("Tell me more—any other symptoms or details?")
-
-    elif session["stage"] == "referral":
-        responses.append("Would you prefer a general physician or a specialist?")
-        session["stage"] = "complete"
-
     else:
-        responses.append("Take care, and feel free to chat with me anytime.")
+        responses.append("Here's the doctor list.Take care, and feel free to chat with me anytime.")
 
     return jsonify({
         "response": responses,
