@@ -11,11 +11,6 @@ import joblib
 # Initialize the blueprint
 disease_blueprint = Blueprint('disease', __name__)
 
-# Instantiate the disease prediction model
-disease_model = DiseasePredictionModel()
-
-
-
 @disease_blueprint.route('/get_doctors', methods=['POST'])
 def get_doctors():
     try:
