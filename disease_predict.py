@@ -1,40 +1,56 @@
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import LabelEncoder
-from sklearn.svm import SVC
-from sklearn.naive_bayes import GaussianNB
-from sklearn.ensemble import RandomForestClassifier
+import pickle
 import statistics
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from xgboost import XGBClassifier
+from lightgbm import LGBMClassifier
+from tensorflow.keras.models import load_model
 
-class DiseasePredictionModel:
+class DiseasePredictor:
     def __init__(self):
-        # Load and preprocess training data
-        self.data = pd.read_csv('Training.csv').dropna(axis=1)
-        self.encoder = LabelEncoder()
-        self.data["prognosis"] = self.encoder.fit_transform(self.data["prognosis"])
+        self.symptom_index = {}
+        self.label_encoder = None
+        self.final_xgb_model = None
+        self.final_lgbm_model = None
+        self.final_nn_model = None
+        self.scaler = None
+        self.classes_ = None
 
-        # Prepare feature and target variables
-        self.X = self.data.iloc[:, :-1]
-        self.y = self.data.iloc[:, -1]
-
-        # Initialize models
-        self.final_svm_model = SVC()
-        self.final_nb_model = GaussianNB()
-        self.final_rf_model = RandomForestClassifier(random_state=18)
-
-        # Train models
-        self.final_svm_model.fit(self.X, self.y)
-        self.final_nb_model.fit(self.X, self.y)
-        self.final_rf_model.fit(self.X, self.y)
-
-        # Store symptoms and class mappings
-        symptoms = self.X.columns.values
-        self.symptom_index = {val: idx for idx, val in enumerate(symptoms)}
-
-        self.predictions_classes = self.encoder.classes_
+    @classmethod
+    def load_models(cls, models_dir='./models/'):
+        """
+        Load all trained models and metadata
+        """
+        predictor = cls()
+        
+        # Load metadata
+        with open(f"{models_dir}metadata.pkl", "rb") as f:
+            metadata = pickle.load(f)
+        
+        predictor.symptom_index = metadata['symptom_index']
+        predictor.label_encoder = metadata['label_encoder']
+        predictor.scaler = metadata['scaler']
+        predictor.classes_ = metadata.get('classes', predictor.label_encoder.classes_)
+        
+        # Load XGBoost model
+        with open(f"{models_dir}xgb_model.pkl", "rb") as f:
+            predictor.final_xgb_model = pickle.load(f)
+        
+        # Load LightGBM model
+        with open(f"{models_dir}lgbm_model.pkl", "rb") as f:
+            predictor.final_lgbm_model = pickle.load(f)
+        
+        # Load Neural Network model
+        predictor.final_nn_model = load_model(f"{models_dir}nn_model.keras")
+        
+        print("All models and metadata loaded successfully")
+        return predictor
 
     def predict(self, symptoms):
-        # Check if symptoms are passed as a list or comma-separated string
+        """
+        Predict disease based on input symptoms
+        """
         if isinstance(symptoms, str):
             symptoms = symptoms.split(",")
         elif not isinstance(symptoms, list):
@@ -47,34 +63,33 @@ class DiseasePredictionModel:
             if index is not None:
                 input_data[index] = 1
             else:
-                print(f"Warning: {symptom.strip()} not found in symptom index.")  # Debugging missing symptoms
+                print(f"Warning: {symptom.strip()} not found in symptom index.")
 
+        # Convert and scale input
         input_data = np.array(input_data).reshape(1, -1)
-        print("Input Vector: ", input_data)
+        input_data_scaled = self.scaler.transform(input_data)
 
+        # Predict with each model
+        xgb_pred_idx = int(self.final_xgb_model.predict(input_data_scaled)[0])
+        lgbm_pred_idx = int(self.final_lgbm_model.predict(input_data_scaled)[0])
+        nn_pred_idx = int(np.argmax(self.final_nn_model.predict(input_data_scaled), axis=1)[0])
 
-        # Get predictions from all models
-        rf_prediction = self.predictions_classes[self.final_rf_model.predict(input_data)[0]]
-        nb_prediction = self.predictions_classes[self.final_nb_model.predict(input_data)[0]]
-        svm_prediction = self.predictions_classes[self.final_svm_model.predict(input_data)[0]]
+        xgb_prediction = self.classes_[xgb_pred_idx]
+        lgbm_prediction = self.classes_[lgbm_pred_idx]
+        nn_prediction = self.classes_[nn_pred_idx]
 
-        print("RF Prediction: ", rf_prediction)
-        print("NB Prediction: ", nb_prediction)
-        print("SVM Prediction: ", svm_prediction)
+        print("XGBoost Prediction: ", xgb_prediction)
+        print("LightGBM Prediction: ", lgbm_prediction)
+        print("Neural Network Prediction: ", nn_prediction)
 
-
-        # Combine predictions
         try:
-            final_prediction = statistics.mode([rf_prediction, nb_prediction, svm_prediction])
-            print("Final Prediction: ", final_prediction)
-
+            final_prediction = statistics.mode([xgb_prediction, lgbm_prediction, nn_prediction])
         except statistics.StatisticsError:
-            # Handle the case where there is no unique mode, fallback to one of the predictions
-            final_prediction = rf_prediction  # Fallback to RandomForest prediction
+            final_prediction = xgb_prediction  # fallback
 
         return {
-            "rf_model_prediction": rf_prediction,
-            "naive_bayes_prediction": nb_prediction,
-            "svm_model_prediction": svm_prediction,
-            "final_prediction": final_prediction,
+            "xgb_model_prediction": xgb_prediction,
+            "lgbm_model_prediction": lgbm_prediction,
+            "neural_network_prediction": nn_prediction,
+            "final_prediction": nn_prediction,
         }
