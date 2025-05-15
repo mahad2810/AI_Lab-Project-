@@ -1,13 +1,12 @@
 from flask import Blueprint, request, jsonify
-from disease_predict import DiseasePredictor
+from disease_predict import DiseasePredictionModel
 from gemini_api import create_nurse_chat, continue_nurse_chat, get_precautions_from_gemini, get_routine_from_gemini
 import spacy
 import re
 
 chatbot_blueprint = Blueprint('chatbot', __name__)
 user_sessions = {}
-# Load the trained models and metadata
-disease_model = DiseasePredictor.load_models()
+disease_model = DiseasePredictionModel()
 
 # Load spaCy model
 print("Loading spaCy model...")
