@@ -6,7 +6,7 @@ import re
 
 chatbot_blueprint = Blueprint('chatbot', __name__)
 user_sessions = {}
-disease_model = DiseasePredictionModel()
+disease_model = DiseasePredictionModel.load_model('disease_model.pkl')
 
 # Load spaCy model
 print("Loading spaCy model...")
@@ -78,29 +78,30 @@ followup_questions = {
     "fever": "Have you measured your temperature? How high was it?"
 }
 
-# Symptom extraction function
 def extract_symptoms(text):
-    text = text.lower()
-    doc = nlp(text)
-    lemmas = " ".join([token.lemma_ for token in doc])
+    # Clean the input text
+    text = re.sub(r'[^\w\s]', '', text.lower())  # Remove all punctuation
+    words = text.split()
     found = set()
 
-    for phrase, mapped in synonyms.items():
-        if phrase in text or phrase in lemmas:
-            found.add(mapped)
+    # Check each word against symptoms and synonyms
+    for word in words:
+        # Check for partial matches in symptoms
+        for symptom in symptoms:
+            # If symptom contains this word (e.g., "fever" in "high_fever")
+            if word in symptom.lower().split('_'):
+                found.add(symptom)
+        
+        # Check for exact matches in synonyms
+        for phrase, mapped in synonyms.items():
+            if word in phrase.lower().split():
+                found.add(mapped)
 
-    for sym in symptoms:
-        sym_clean = sym.replace("_", " ")
-        if sym_clean in text or sym_clean in lemmas:
-            found.add(sym)
-
-    for sym in symptoms:
-        try:
-            score = doc.similarity(nlp(sym.replace("_", " ")))
-            if score > 0.85:
-                found.add(sym)
-        except:
-            continue
+    # Handle multi-word symptoms by checking the original text
+    for symptom in symptoms:
+        symptom_clean = symptom.replace('_', ' ')
+        if symptom_clean in text:  # Exact phrase match
+            found.add(symptom)
 
     return list(found)
 
